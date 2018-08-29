@@ -5,13 +5,11 @@ import isEmpty from 'lodash/isEmpty';
 import debounce from 'lodash/debounce';
 
 import API from '../../utils/api';
-
 import PackageList from '../../components/PackageList';
 import Search from '../../components/Search';
 
 export default class Home extends Component {
   static propTypes = {
-    children: PropTypes.element,
     isUserLoggedIn: PropTypes.bool
   };
 
@@ -64,7 +62,11 @@ export default class Home extends Component {
       MessageBox.msgbox({
         type: 'error',
         title: 'Warning',
-        message: `Unable to load package list: ${error.message}`
+        message: `Unable to load package list: ${error.error}`
+      });
+    } finally {
+      this.setState({
+        loading: false
       });
     }
   }
@@ -86,6 +88,10 @@ export default class Home extends Component {
         type: 'error',
         title: 'Warning',
         message: 'Unable to get search result, please try again later.'
+      });
+    } finally {
+      this.setState({
+        loading: false
       });
     }
   }
