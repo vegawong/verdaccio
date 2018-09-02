@@ -41,17 +41,18 @@ export function convertPayloadToBase64(payload: string): Buffer {
  * Validate a package.
  * @return {Boolean} whether the package is valid or not
  */
-function validate_package(name: any): boolean {
-  name = name.split('/', 2);
-  if (name.length === 1) {
+function validate_package(name: string): boolean {
+  const resolvedName = name.split('/', 2);
+
+  if (resolvedName.length === 1) {
     // normal package
     return validateName(name[0]);
   } else {
     // scoped package
     return (
-      name[0][0] === '@' &&
-      validateName(name[0].slice(1)) &&
-      validateName(name[1])
+      resolvedName[0][0] === '@' &&
+      validateName(resolvedName[0].slice(1)) &&
+      validateName(resolvedName[1])
     );
   }
 }
@@ -65,17 +66,18 @@ function validateName(name: string): boolean {
   if (_.isString(name) === false) {
     return false;
   }
-  name = name.toLowerCase();
+
+  const normalizedName: string = name.toLowerCase();
 
   // all URL-safe characters and "@" for issue #75
   return !(
-    !name.match(/^[-a-zA-Z0-9_.!~*'()@]+$/) ||
-    name.charAt(0) === '.' || // ".bin", etc.
-    name.charAt(0) === '-' || // "-" is reserved by couchdb
-    name === 'node_modules' ||
-    name === '__proto__' ||
-    name === 'package.json' ||
-    name === 'favicon.ico'
+    !normalizedName.match(/^[-a-zA-Z0-9_.!~*'()@]+$/) ||
+    normalizedName.charAt(0) === '.' || // ".bin", etc.
+    normalizedName.charAt(0) === '-' || // "-" is reserved by couchdb
+    normalizedName === 'node_modules' ||
+    normalizedName === '__proto__' ||
+    normalizedName === 'package.json' ||
+    normalizedName === 'favicon.ico'
   );
 }
 
