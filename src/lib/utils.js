@@ -41,18 +41,17 @@ export function convertPayloadToBase64(payload: string): Buffer {
  * Validate a package.
  * @return {Boolean} whether the package is valid or not
  */
-function validate_package(name: string): boolean {
-  const resolvedName = name.split('/', 2);
-
-  if (resolvedName.length === 1) {
+function validate_package(name: any): boolean {
+  name = name.split('/', 2);
+  if (name.length === 1) {
     // normal package
     return validateName(name[0]);
   } else {
     // scoped package
     return (
-      resolvedName[0][0] === '@' &&
-      validateName(resolvedName[0].slice(1)) &&
-      validateName(resolvedName[1])
+      name[0][0] === '@' &&
+      validateName(name[0].slice(1)) &&
+      validateName(name[1])
     );
   }
 }
@@ -225,7 +224,7 @@ function tagVersion(data: Package, version: string, tag: StringValue) {
  */
 function getVersion(pkg: Package, version: any) {
   // this condition must allow cast
-  if (pkg.versions[version] != null) {
+  if (_.isNil(pkg.versions[version]) === false) {
     return pkg.versions[version];
   }
 
