@@ -63,13 +63,13 @@ describe('<LoginModal />', () => {
       }
     }
     expect(setCredentials('username', eventUsername)).toBeUndefined();
-    expect(wrapper.state('username')).toEqual('xyz');
+    expect(wrapper.state('form').username.value).toEqual('xyz');
 
     expect(setCredentials('password', eventPassword)).toBeUndefined();
-    expect(wrapper.state('password')).toEqual('1234');
+    expect(wrapper.state('form').password.value).toEqual('1234');
   });
 
-  it('submitCredential: should call the onSubmit', () => {
+  it('validateCredentials: should validate credentials', async () => {
     const props = {
       visibility: true,
       error: {},
@@ -80,12 +80,39 @@ describe('<LoginModal />', () => {
     const event = {
       preventDefault: jest.fn()
     };
+
+    const wrapper = mount(<LoginModal {...props} />);
+    const { validateCredentials, setCredentials, submitCredentials } = wrapper.instance();
+    await setCredentials('username', 'sam');
+    await setCredentials('username', 'sam');
+    wrapper.setState({ username: 'sam', password: 1234 })
+    await validateCredentials(event);
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(wrapper.state('form').username.pristine).toEqual(false);
+    expect(wrapper.state('form').username.value).toEqual("");
+    expect(wrapper.state('form').password.pristine).toEqual(false);
+    expect(wrapper.state('form').username.value).toEqual("");
+    expect(submitCredentials).toHaveBeenCalled();
+    expect(props.onSubmit).toHaveBeenCalledWith('sam', 1234);
+    // expect(event.preventDefault).toHaveBeenCalled();
+    // expect(props.onSubmit).toHaveBeenCalledWith('sam', '1234');
+  });
+
+
+  it('submitCredentials: should submit credentials',  async () => {
+    const props = {
+      onSubmit: jest.fn()
+    };
+
     const wrapper = mount(<LoginModal {...props} />);
     const { submitCredentials } = wrapper.instance();
     wrapper.setState({ username: 'sam', password: 1234 })
-    await submitCredentials(event);
-    expect(props.onSubmit).toHaveBeenCalledWith('sam', 1234);
-    expect(event.preventDefault).toHaveBeenCalled();
+    await submitCredentials();
     expect(props.onSubmit).toHaveBeenCalledWith('sam', '1234');
+    expect(wrapper.state('form').username.value).toEqual('');
+    expect(wrapper.state('form').username.pristine).toEqual(true);
+    expect(wrapper.state('form').password.value).toEqual('');
+    expect(wrapper.state('form').password.pristine).toEqual(true);
   });
+
 });
